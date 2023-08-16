@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'PR compliance action'
+description: 'Check authors and title/description of a PR'
+author: 'GoodData'
 inputs:
-  milliseconds: # change this
-    required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+  special-authors:
+    required: false
+    description: 'The PR is compliant if all commits of the PR are authored by special-authors'
+  special-title-regexes:
+    required: false
+    description: ''
+  required-ticket-regex:
+    required: false
+    description: 'Regular expression of a string that should be mentioned in PR title or PR description'
 runs:
   using: 'node16'
   main: 'dist/index.js'
