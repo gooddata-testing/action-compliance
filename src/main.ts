@@ -3,12 +3,9 @@ import {wait} from './wait'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
-
     core.debug(new Date().toTimeString())
     core.info("Hello from action-compliance")
-    await wait(parseInt(ms, 10))
+    await wait(1000)
     core.debug(new Date().toTimeString())
 
     core.setOutput('time', new Date().toTimeString())
