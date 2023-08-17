@@ -2,6 +2,9 @@ name: 'PR compliance action'
 description: 'Check authors and title/description of a PR'
 author: 'GoodData'
 inputs:
+  token:
+    required: true
+    description: "Token to query GitHub API"
   special-authors:
     required: false
     description: 'The PR is compliant if all commits of the PR are authored by special-authors'
