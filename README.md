@@ -25,7 +25,7 @@ required-ticket-regex | (none) | String | If the PR title or description match t
 
 If a particular input is not used the related check will be skipped.
 
-*WARNING:* The regular expression need to have backslash character escaped (prepended with another backslash).
+*WARNING:* The regular expressions taken from action inputs don't need to be escaped (the backslash should not be doubled).
 # Example
 
 ```yaml
