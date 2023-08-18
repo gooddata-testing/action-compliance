@@ -1,6 +1,139 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 2321:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.matchesTicketRegex = exports.hasSpecialTitle = exports.hasOnlySpecialAuthors = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+const github = __importStar(__nccwpck_require__(5438));
+function hasOnlySpecialAuthors(SPECIAL_AUTHORS, token) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(token);
+        const { eventName, payload: { repository: repo, pull_request: pull_request } } = github.context;
+        if (eventName != "pull_request") {
+            core.setFailed("Unsupported event: ${eventName}");
+            return true;
+        }
+        if (repo == undefined) {
+            core.setFailed("repo is undefined in github even context");
+            return true;
+        }
+        if (pull_request == undefined) {
+            core.setFailed("pull_request is undefined in github even context");
+            return true;
+        }
+        const commits = yield octokit.rest.pulls.listCommits({
+            owner: repo.owner.login,
+            repo: repo.name,
+            pull_number: pull_request.number
+        });
+        var allCommitsHaveSpecialAuthors = true;
+        for (let commit of commits.data) {
+            if (commit.author == null) {
+                break;
+            }
+            var commit_author = commit.author.login;
+            core.debug("author: " + commit_author);
+            var foundSpecialAuthor = false;
+            for (let author of SPECIAL_AUTHORS.split('\n')) {
+                core.debug("special author: " + author);
+                var r = RegExp(author);
+                if (r.test(commit_author)) {
+                    core.debug("Special author matches commit author");
+                    foundSpecialAuthor = true;
+                    break;
+                }
+                else {
+                    core.debug("Special author does not match commit author");
+                }
+            }
+            ;
+            if (!foundSpecialAuthor) {
+                allCommitsHaveSpecialAuthors = false;
+                break;
+            }
+        }
+        ;
+        if (allCommitsHaveSpecialAuthors) {
+            core.info("All commits have special author => PR is compliant");
+            return true;
+        }
+        core.debug("Not all commits have special author => checking further");
+        return false;
+    });
+}
+exports.hasOnlySpecialAuthors = hasOnlySpecialAuthors;
+function hasSpecialTitle(SPECIAL_TITLE_REGEXES, prTitle) {
+    var foundMatchingSpecialRegex = false;
+    for (let regex of SPECIAL_TITLE_REGEXES.split('\n')) {
+        var r = RegExp(regex);
+        if (r.test(prTitle)) {
+            foundMatchingSpecialRegex = true;
+            break;
+        }
+    }
+    if (foundMatchingSpecialRegex) {
+        core.info("Title mentions special keywoard => PR is compliant");
+        return true;
+    }
+    core.debug("The title does not mention any special keyword  => checking further");
+    return false;
+}
+exports.hasSpecialTitle = hasSpecialTitle;
+function matchesTicketRegex(REQUIRED_TICKET_REGEX, prTitle, prDescription) {
+    core.debug("title: " + prTitle);
+    core.debug("description: " + prDescription);
+    core.debug("regex: " + REQUIRED_TICKET_REGEX);
+    let r = RegExp(REQUIRED_TICKET_REGEX.trim());
+    core.debug("compiled regex: " + r);
+    if (r.test(prTitle) || r.test(prDescription)) {
+        core.info("Title or description matches the required ticket regular expression => PR is compliant");
+        return true;
+    }
+    core.debug("Neither title nor description match the required ticket regular expression");
+    return false;
+}
+exports.matchesTicketRegex = matchesTicketRegex;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -40,8 +173,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
-const github = __importStar(__nccwpck_require__(5438));
 const utils_1 = __nccwpck_require__(3030);
+const checks_1 = __nccwpck_require__(2321);
 const SPECIAL_AUTHORS = core.getInput('special-authors').trim();
 const SPECIAL_TITLE_REGEXES = core.getInput('special-title-regexes').trim();
 const REQUIRED_TICKET_REGEX = core.getInput('required-ticket-regex').trim();
@@ -49,102 +182,39 @@ function run() {
     var _a, _b, _c, _d;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            core.info("Hello from action-compliance");
-            const { eventName, payload: { repository: repo, pull_request: pull_request } } = github.context;
-            if (eventName != "pull_request") {
-                core.setFailed("Unsupported event: ${eventName}");
-                return;
-            }
-            if (repo == undefined) {
-                core.setFailed("repo is undefined in github even context");
-                return;
-            }
-            if (pull_request == undefined) {
-                core.setFailed("pull_request is undefined in github even context");
-                return;
-            }
-            const token = core.getInput('token');
-            const octokit = github.getOctokit(token);
             // First condition:
             // If all commits are from special authors
             //
             if (SPECIAL_AUTHORS != undefined && SPECIAL_AUTHORS != "") {
-                const commits = yield octokit.rest.pulls.listCommits({
-                    owner: repo.owner.login,
-                    repo: repo.name,
-                    pull_number: pull_request.number
-                });
-                var allCommitsHaveSpecialAuthors = true;
-                for (let commit of commits.data) {
-                    if (commit.author == null) {
-                        break;
-                    }
-                    var commit_author = commit.author.login;
-                    core.debug("author: " + commit_author);
-                    var foundSpecialAuthor = false;
-                    for (let author of SPECIAL_AUTHORS.split('\n')) {
-                        core.debug("special author: " + author);
-                        var r = RegExp(author);
-                        if (r.test(commit_author)) {
-                            core.debug("Special author matches commit author");
-                            foundSpecialAuthor = true;
-                            break;
-                        }
-                        else {
-                            core.debug("Special author does not match commit author");
-                        }
-                    }
-                    ;
-                    if (!foundSpecialAuthor) {
-                        allCommitsHaveSpecialAuthors = false;
-                        break;
-                    }
-                }
-                ;
-                if (allCommitsHaveSpecialAuthors) {
-                    core.info("All commits have special author => PR is compliant");
+                if (yield (0, checks_1.hasOnlySpecialAuthors)(SPECIAL_AUTHORS, core.getInput('token'))) {
                     return;
                 }
-                core.debug("Not all commits have special author => checking further");
             }
             const prTitle = (_b = (_a = utils_1.context === null || utils_1.context === void 0 ? void 0 : utils_1.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) === null || _b === void 0 ? void 0 : _b.title;
             if (prTitle == undefined) {
                 core.setFailed("Failed to determine pull request title");
                 return;
             }
+            // Second condition:
+            // The pull request title states it is a special PR
+            //
+            if (SPECIAL_TITLE_REGEXES != undefined && SPECIAL_TITLE_REGEXES != "") {
+                if ((0, checks_1.hasSpecialTitle)(SPECIAL_TITLE_REGEXES, prTitle)) {
+                    return;
+                }
+            }
+            // Third condition:
+            // The pull request title or description match a special regex (usually a ticket)
+            //
             const prDescription = (_d = (_c = utils_1.context === null || utils_1.context === void 0 ? void 0 : utils_1.context.payload) === null || _c === void 0 ? void 0 : _c.pull_request) === null || _d === void 0 ? void 0 : _d.body;
             if (prDescription == undefined) {
                 core.setFailed("Failed to determine pull request description");
                 return;
             }
-            // Second condition:
-            // The pull request title or description states it is a special PR
-            //
-            if (SPECIAL_TITLE_REGEXES != undefined && SPECIAL_TITLE_REGEXES != "") {
-                var foundMatchingSpecialRegex = false;
-                for (let regex of SPECIAL_TITLE_REGEXES.split('\n')) {
-                    r = RegExp(regex);
-                    if (r.test(prTitle) || r.test(prDescription)) {
-                        foundMatchingSpecialRegex = true;
-                        break;
-                    }
-                }
-                if (foundMatchingSpecialRegex) {
-                    core.info("Title or description mentions special keywoard => PR is compliant");
-                    return;
-                }
-                core.debug("The title nor description mention special keywords  => checking further");
-            }
-            // Third condition:
-            // The pull request title or description match a special regex (usually a ticket)
-            //
             if (REQUIRED_TICKET_REGEX != undefined && REQUIRED_TICKET_REGEX != "") {
-                r = RegExp(REQUIRED_TICKET_REGEX.trim());
-                if (r.test(prTitle) || r.test(prDescription)) {
-                    core.info("Title or description matches the required ticket regular expression => PR is compliant");
+                if ((0, checks_1.matchesTicketRegex)(REQUIRED_TICKET_REGEX, prTitle, prDescription)) {
                     return;
                 }
-                core.debug("Neither title nor description maches the required ticket regular expression");
             }
             core.setFailed("PR is not compliant");
         }

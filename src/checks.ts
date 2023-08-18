@@ -74,7 +74,11 @@ function hasSpecialTitle(SPECIAL_TITLE_REGEXES: string, prTitle: string): boolea
 }
 
 function matchesTicketRegex(REQUIRED_TICKET_REGEX: string, prTitle: string, prDescription: string): boolean {
+    core.debug("title: " + prTitle)
+    core.debug("description: " + prDescription)
+    core.debug("regex: " + REQUIRED_TICKET_REGEX)
     let r = RegExp(REQUIRED_TICKET_REGEX.trim())
+    core.debug("compiled regex: " + r)    
     if(r.test(prTitle) || r.test(prDescription)) {
       core.info("Title or description matches the required ticket regular expression => PR is compliant")
       return true
