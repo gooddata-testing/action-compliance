@@ -11,14 +11,14 @@ async function run(): Promise<void> {
         // First condition:
         // If all commits are from special authors
         //
-        if (SPECIAL_AUTHORS != undefined && SPECIAL_AUTHORS != "") {
+        if (SPECIAL_AUTHORS) {
             if (await hasOnlySpecialAuthors(SPECIAL_AUTHORS, core.getInput("token"))) {
                 return;
             }
         }
 
         const prTitle = context?.payload?.pull_request?.title;
-        if (prTitle == undefined) {
+        if (!prTitle) {
             core.setFailed("Failed to determine pull request title");
             return;
         }
@@ -26,7 +26,7 @@ async function run(): Promise<void> {
         // Second condition:
         // The pull request title states it is a special PR
         //
-        if (SPECIAL_TITLE_REGEXES != undefined && SPECIAL_TITLE_REGEXES != "") {
+        if (SPECIAL_TITLE_REGEXES) {
             if (hasSpecialTitle(SPECIAL_TITLE_REGEXES, prTitle)) {
                 return;
             }
@@ -36,12 +36,12 @@ async function run(): Promise<void> {
         // The pull request title or description match a special regex (usually a ticket)
         //
         const prDescription = context?.payload?.pull_request?.body;
-        if (prDescription == undefined) {
+        if (!prDescription) {
             core.setFailed("Failed to determine pull request description");
             return;
         }
 
-        if (REQUIRED_TICKET_REGEX != undefined && REQUIRED_TICKET_REGEX != "") {
+        if (REQUIRED_TICKET_REGEX) {
             if (matchesTicketRegex(REQUIRED_TICKET_REGEX, prTitle, prDescription)) {
                 return;
             }

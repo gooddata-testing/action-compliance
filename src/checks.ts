@@ -11,11 +11,11 @@ async function hasOnlySpecialAuthors(SPECIAL_AUTHORS: string, token: string): Pr
         core.setFailed("Unsupported event: ${eventName}");
         return true;
     }
-    if (repo == undefined) {
+    if (!repo) {
         core.setFailed("repo is undefined in github even context");
         return true;
     }
-    if (pull_request == undefined) {
+    if (!pull_request) {
         core.setFailed("pull_request is undefined in github even context");
         return true;
     }
@@ -26,18 +26,18 @@ async function hasOnlySpecialAuthors(SPECIAL_AUTHORS: string, token: string): Pr
         pull_number: pull_request.number,
     });
 
-    var allCommitsHaveSpecialAuthors: boolean = true;
+    let allCommitsHaveSpecialAuthors: boolean = true;
     for (let commit of commits.data) {
         if (commit.author == null) {
             break;
         }
-        var commit_author = commit.author.login;
+        const commit_author = commit.author.login;
         core.debug("author: " + commit_author);
 
-        var foundSpecialAuthor: boolean = false;
+        let foundSpecialAuthor: boolean = false;
         for (let author of SPECIAL_AUTHORS.split("\n")) {
             core.debug("special author: " + author);
-            var r = RegExp(author);
+            let r = RegExp(author);
             if (r.test(commit_author)) {
                 core.debug("Special author matches commit author");
                 foundSpecialAuthor = true;
@@ -60,9 +60,9 @@ async function hasOnlySpecialAuthors(SPECIAL_AUTHORS: string, token: string): Pr
 }
 
 function hasSpecialTitle(SPECIAL_TITLE_REGEXES: string, prTitle: string): boolean {
-    var foundMatchingSpecialRegex = false;
+    let foundMatchingSpecialRegex = false;
     for (let regex of SPECIAL_TITLE_REGEXES.split("\n")) {
-        var r = RegExp(regex);
+        let r = RegExp(regex);
         if (r.test(prTitle)) {
             foundMatchingSpecialRegex = true;
             break;
