@@ -4,16 +4,17 @@ author: 'GoodData'
 inputs:
   token:
     required: true
-    description: "Token to query GitHub API"
+    description: "Token to query GitHub API. It needs to have pull-request:read permission"
+    default: ${{ github.token }}
   special-authors:
     required: false
     description: 'The PR is compliant if all commits of the PR are authored by special-authors'
   special-title-regexes:
     required: false
-    description: ''
+    description: 'The PR is compliant if title or description contains matches one of these regular expressions'
   required-ticket-regex:
     required: false
-    description: 'Regular expression of a string that should be mentioned in PR title or PR description'
+    description: 'PR title or description must match this regular expression'
 runs:
   using: 'node16'
   main: 'dist/index.js'
